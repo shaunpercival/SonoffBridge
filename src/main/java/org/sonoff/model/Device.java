@@ -8,6 +8,8 @@ public class Device {
     private String type;
     private String description;
 
+
+
     public Device() {
     }
 
@@ -33,6 +35,7 @@ public class Device {
 
     public void setId(int id) {
         this.id = id;
+        System.out.println("setId " + id);
     }
 
     public void setName(String name) {
