@@ -1,4 +1,6 @@
-build
+build/
 *.jar
 *.war
 *.log
+*.class
+.gradle/
