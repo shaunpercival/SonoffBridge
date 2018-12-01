@@ -104,6 +104,7 @@ public class DeviceWebSocketServer {
             switch(action){
                 case "date":
                     Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
+                    ;
                     sessionHandler.handleSonoffDateRequest(session,device);
                     break;
                 case "query":
