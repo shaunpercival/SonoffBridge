@@ -43,7 +43,7 @@ public class SonoffClient  {
             container = ContainerProvider.getWebSocketContainer();
            //WS1 is the context-root of my web.app
              //ratesrv is the  path given in the ServerEndPoint annotation on server implementation
-            session=container.connectToServer(SonoffClient.class, URI.create("ws://localhost:8080/SonoffWebSockets-722e26d/actions"));
+            session=container.connectToServer(SonoffClient.class, URI.create("ws://localhost:8080/sonoffwebsockets/actions"));
 
             SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
             String formatedDate = formatter.format(new Date());
@@ -61,7 +61,7 @@ public class SonoffClient  {
              device.setType("Appliance");
              device.setDescription("test");
 
-             JsonObject addMessage = new DeviceSessionHandler().createAddMessage(device);
+             JsonObject addMessage = new DeviceSessionHandler().createAddDeviceMessage(device);
 
              session.getAsyncRemote().sendObject(addMessage);
 

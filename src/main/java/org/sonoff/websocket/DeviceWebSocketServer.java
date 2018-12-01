@@ -1,3 +1,12 @@
+/**
+ * https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01
+
+ *
+ *
+ */
+
+
+
 package org.sonoff.websocket;
 
 
@@ -78,6 +87,8 @@ public class DeviceWebSocketServer {
         logger.error( error);
     }
 
+    static String J_DEVICE_ID = "deviceid";
+
     @OnMessage
     public void handleMessage(String message, Session session) {
 
@@ -87,14 +98,54 @@ public class DeviceWebSocketServer {
 
             JsonReader reader = Json.createReader(new StringReader(message))) {
             JsonObject jsonMessage = reader.readObject();
+            String action = jsonMessage.getString("action");
+            logger.info("here 0");
 
-            if ("add".equals(jsonMessage.getString("action"))) {
+            switch(action){
+                case "date":
+                    Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
+                    sessionHandler.handleSonoffDateRequest(session,device);
+                    break;
+                case "query":
+                //device wants information on timers
+//                var device = self._knownDevices.find(d=>d.id == data.deviceid);
+//                if(!device) {
+//                    console.log('ERR | WS | Unknown device ',data.deviceid);
+//                } else {
+//                        /*if(data.params.includes('timers')){
+//                         console.log('INFO | WS | Device %s asks for timers',device.id);
+//                         if(device.timers){
+//                         res.params = [{timers : device.timers}];
+//                         }
+//                         }*/
+//                    res.params = {};
+//                    data.params.forEach(p=>{
+//                            res.params[p] = device[p];
+//                    });
+
+
+                    break;
+                case "register":
+                        break;
+                case "update":
+                        break;
+                default:
+                    logger.warn("Action not found: " + action);
+
+            }
+
+            if ("add".equals(action)) {
+                logger.info("here 0.1");
                 Device device = new Device();
+                logger.info("here 0.2");
                 device.setName(jsonMessage.getString("name"));
                 device.setDescription(jsonMessage.getString("description"));
                 device.setType(jsonMessage.getString("type"));
-                device.setId(jsonMessage.getInt("id"));
+                if ( !jsonMessage.isNull("id") ) {
+                    device.setId(jsonMessage.getInt("id"));
+                }
                 device.setStatus("Off");
+                logger.info("here 1");
                 sessionHandler.addDevice(device);
             }
 
@@ -107,6 +158,10 @@ public class DeviceWebSocketServer {
                 int id = (int) jsonMessage.getInt("id");
                 sessionHandler.toggleDevice(id);
             }
+        }catch(Exception e){
+            logger.info("what: " + e.getStackTrace().toString());
+            e.printStackTrace();
+            logger.error(e);
         }
     }
 }

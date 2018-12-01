@@ -1,0 +1,47 @@
+<html>
+<body>
+<h1>Set device to WS</h1>
+<h3>Get device details</h3>
+<p>1: Connect to http://10.10.7.1/device
+</p>
+Will need route added:  route change 0.0.0.0 mask 0.0.0.0 10.10.7.1
+<p>
+</p>
+<p>
+    As response you will get following JSON object
+
+    {
+    "deviceid":"10000xxxxx",
+    "apikey":"xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "accept":"post"
+    }
+</p>
+<h3>Configure SSID for device</h3>
+<p>
+   HTTP Post to:  http://10.10.7.1/ap
+</p>
+<p> {
+    "version": 4,
+    "ssid": [YOUR NETWORK SSID],
+    "password": [YOUR NETWORK PASSWORD],
+    "serverName": [IP OF YOUR SERVER],
+    "port": [PORT OF YOUR SERVER]
+    }
+</p>
+<h1>Get device onto WS Socket</h1>
+<p> On connection
+    {
+    "error": 0,
+    "reason": "ok",
+    "IP": [YOUR WEBSOCKET SERVER IP],
+    "port": [YOUR WEBSOCKET SERVER PORT]
+    }
+</p>
+
+
+
+
+
+</body>
+
+</html>

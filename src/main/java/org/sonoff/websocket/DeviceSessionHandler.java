@@ -38,7 +38,7 @@ public class DeviceSessionHandler {
         sessions.add(session);
         for (Device device : devices) {
             logger.info("addSession:Notifing device: " + device.getName());
-            JsonObject addMessage = createAddMessage(device);
+            JsonObject addMessage = createAddDeviceMessage(device);
             sendToSession(session, addMessage);
         }
 
@@ -54,15 +54,19 @@ public class DeviceSessionHandler {
         return new ArrayList<>(devices);
     }
 
+    public void handleSonoffDateRequest(Session session, Device device){
+         sendToSession( session, JsonResponseMessage.createDateMessage(device));
+    }
 
 
     public void addDevice(Device device) {
+        logger.info("here 3");
         if (  device.getId() == 0) {
             device.setId(deviceId);
             deviceId++;
         }
         devices.add(device);
-        JsonObject addMessage = createAddMessage(device);
+        JsonObject addMessage = createAddDeviceMessage(device);
         logger.info("addDevice::sendToAllConnections: " + device.getName());
         sendToAllConnectedSessions(addMessage);
     }
@@ -110,7 +114,16 @@ public class DeviceSessionHandler {
         return null;
     }
 
-    public JsonObject createAddMessage(Device device) {
+    public Device getDevice(String key) {
+        for (Device device : devices) {
+            if (device.getDeviceId() == key) {
+                return device;
+            }
+        }
+        return null;
+    }
+
+    public JsonObject createAddDeviceMessage(Device device) {
         JsonProvider provider = JsonProvider.provider();
         JsonObject addMessage = provider.createObjectBuilder()
                 .add("action", "add")

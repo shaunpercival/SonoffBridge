@@ -74,6 +74,15 @@ task echo{
   //  println "echo $printenv"
 }
 
+jar {
+    archiveName = 'sonoffwebsockets.jar'
+}
+
+
+war {
+    archiveName = 'sonoffwebsockets.war'
+}
+
 
 task run(dependsOn: 'war', type:Exec) {
    // workingDir "${glassfishHome${File.separator}bin"
@@ -85,5 +94,5 @@ task run(dependsOn: 'war', type:Exec) {
 
     commandLine "./asadmin"
    // }
-    args "deploy", "--force=true", "/home/bearingpoint/wk-devops/SonoffWebSockets/build/libs/SonoffWebSockets-4.10.2.war"
+    args "deploy", "--force=true", "/home/bearingpoint/wk-devops/SonoffWebSockets/build/libs/sonoffwebsockets.war"
  }

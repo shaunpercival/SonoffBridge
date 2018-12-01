@@ -5,7 +5,9 @@
 
 
 window.onload = init;
-var socket = new WebSocket("ws://localhost:8080/SonoffWebSockets-722e26d/actions");
+
+
+var socket = new WebSocket("ws://localhost:8080/sonoffwebsockets/actions");
 //var socket = new WebSocket("ws://localhost:8080/WebsocketHome/actions");
 
 socket.onmessage = onMessage;
@@ -35,6 +37,7 @@ function addDevice(name, type, description) {
         action: "add",
         name: name,
         type: type,
+        id: null,
         description: description
     };
     socket.send(JSON.stringify(DeviceAction));
