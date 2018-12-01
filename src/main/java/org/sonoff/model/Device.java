@@ -11,6 +11,8 @@ public class Device {
     // Sonoff
     private String apiKey;
     private String deviceId;
+    private String version;
+    private String model;
 
     public String getDeviceId() {
         return deviceId;
@@ -20,8 +22,21 @@ public class Device {
         this.deviceId = deviceId;
     }
 
+    public String getVersion() {
+        return version;
+    }
 
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
 
     public String getDeviceid() {
         return deviceid;

@@ -58,6 +58,11 @@ public class DeviceSessionHandler {
          sendToSession( session, JsonResponseMessage.createDateMessage(device));
     }
 
+    public void handleSonoffRegisterRequest(Session session, Device device){
+        //sendToSession( session, JsonResponseMessage.createDateMessage(device));
+    }
+
+
 
     public void addDevice(Device device) {
         logger.info("here 3");

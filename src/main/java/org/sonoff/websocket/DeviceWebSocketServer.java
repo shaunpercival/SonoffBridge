@@ -102,13 +102,35 @@ public class DeviceWebSocketServer {
             logger.info("here 0");
 
             switch(action){
-                case "date":
+                case "date":{
                     Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
-                    ;
                     sessionHandler.handleSonoffDateRequest(session,device);
                     break;
-                case "query":
-                //device wants information on timers
+                }
+                case "register": {
+                    Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
+                    if ( device == null){
+
+                    }
+                    device.setVersion(jsonMessage.getString("romVersion"));
+                    device.setModel(jsonMessage.getString("model"));
+
+
+                }
+//                    var device = {
+//                            id : data.deviceid
+//                    };
+//                    var type = data.deviceid.substr(0, 2);
+//                    if(type == '01') device.kind = 'switch';
+//                    else if(type == '02') device.kind = 'light';
+//                    else if(type == '03') device.kind = 'sensor'; //temperature and humidity. No timers here;
+//                    device.version = data.romVersion;
+//                    device.model = data.model;
+//                    self._updateKnownDevice(self,device);
+//                    console.log('INFO | WS | Device %s registered', device.id);
+                    break;
+                case "query": {
+                    //device wants information on timers
 //                var device = self._knownDevices.find(d=>d.id == data.deviceid);
 //                if(!device) {
 //                    console.log('ERR | WS | Unknown device ',data.deviceid);
@@ -126,8 +148,7 @@ public class DeviceWebSocketServer {
 
 
                     break;
-                case "register":
-                        break;
+                }
                 case "update":
                         break;
                 default:
