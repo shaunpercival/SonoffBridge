@@ -17,7 +17,8 @@ version = '4.10.2'
 
 
 
-
+//sourceSets.test.resources.srcDirs += [ "src/test/resources" ]
+//sourceSets.main.resources.includes += [ "**/*.png" ]
 
 
 configurations {

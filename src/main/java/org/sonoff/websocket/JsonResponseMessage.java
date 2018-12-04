@@ -25,6 +25,11 @@ public class JsonResponseMessage {
     static String J_API_KEY = "apikey";
     static String J_ERROR = "error";
     static String J_DATE = "date";
+    static String J_IP = "IP";
+    static String J_PORT = "PORT";
+    static String J_REASON = "reason";
+
+
 
     private static JsonObjectBuilder getSonoffBaseResponse(Device device){
         JsonProvider provider = JsonProvider.provider();
@@ -47,6 +52,19 @@ public class JsonResponseMessage {
         return jsonMessage;
     }
 
+
+
+    public static JsonObject createRegisterResponseMessage(Device device) {
+
+        JsonObjectBuilder builder = getSonoffBaseResponse(device);
+
+        SimpleDateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        builder.add(J_IP, sdfISO.format(new Date()));
+        builder.add(J_PORT, "");
+        builder.add(J_REASON, "ok");
+        JsonObject jsonMessage = builder.build();
+        return jsonMessage;
+    }
 
 
 }

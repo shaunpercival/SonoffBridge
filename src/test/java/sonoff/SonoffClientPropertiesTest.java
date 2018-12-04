@@ -4,15 +4,15 @@ package sonoff;
  * Created by bearingpoint on 28/11/18.
  */
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.*;
-
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.*;
+import org.sonoff.utils.SonoffProperties;
 
-public class SonoffClientTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class SonoffClientPropertiesTest {
 
     static Logger log = LogManager.getRootLogger();
 
@@ -37,9 +37,12 @@ public class SonoffClientTest {
 //    }
 
 
-    @DisplayName("Single test successful")
+    @DisplayName("Test Properties Load")
     @Test
-    void testSingleSuccessTest() {
+    void testPropertiesLoadTest() {
+
+        SonoffProperties.loadProperties();
+        SonoffProperties.persistProperty("test1","value1");
         log.info("Success");
     }
 

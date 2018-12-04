@@ -89,6 +89,26 @@ public class DeviceWebSocketServer {
 
     static String J_DEVICE_ID = "deviceid";
 
+
+    private int getJsonVariableInt(JsonObject jsonMessage ,String param){
+        try{
+            return Integer.getInteger(jsonMessage.getString("param")).intValue();
+        } catch (Exception e) {
+            logger.warn("Error extracting param: " + param + " " + e.getMessage());
+        }
+        return 0;
+    }
+
+    private String getJsonVariable(JsonObject jsonMessage ,String param){
+        try{
+            return jsonMessage.getString("param");
+        } catch (Exception e) {
+            logger.warn("Error extracting param: " + param + " " + e.getMessage());
+        }
+        return null;
+    }
+
+
     @OnMessage
     public void handleMessage(String message, Session session) {
 
@@ -101,19 +121,21 @@ public class DeviceWebSocketServer {
             String action = jsonMessage.getString("action");
             logger.info("here 0");
 
+            Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
             switch(action){
                 case "date":{
-                    Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
                     sessionHandler.handleSonoffDateRequest(session,device);
                     break;
                 }
                 case "register": {
-                    Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
-                    if ( device == null){
 
+                    if ( device == null){
+                        device = new Device();
+                        device.setAPIKey(getJsonVariable(jsonMessage,"apikey"));
                     }
-                    device.setVersion(jsonMessage.getString("romVersion"));
-                    device.setModel(jsonMessage.getString("model"));
+                    device.setVersion(getJsonVariable(jsonMessage,"romVersion"));
+                    device.setModel(getJsonVariable(jsonMessage,"model"));
+                    sessionHandler.handleSonoffRegisterRequest(session,device);
 
 
                 }
@@ -158,7 +180,7 @@ public class DeviceWebSocketServer {
 
             if ("add".equals(action)) {
                 logger.info("here 0.1");
-                Device device = new Device();
+                 device = new Device();
                 logger.info("here 0.2");
                 device.setName(jsonMessage.getString("name"));
                 device.setDescription(jsonMessage.getString("description"));

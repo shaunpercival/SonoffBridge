@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+Sonoff switch complete hack without firmware upgrade
+Go to the profile of Ipsum Domus
+Ipsum DomusFollow
+Mar 21, 2017
+Usually, when we are reading reviews about cost effective smart home power relays or switches, we are speaking about Sonoff (@Iteadstudio). 5USD wifi managed reliable one channel relay. What can be better to build real smart home infrastructure? The problem is, that this nice device is only cloud-dependent. Meaning, you cannot run it without internet connection on your local network. Solution is also looks simple, if you google it for a little — reflash it with one of open source firmwares and be happy.
+
+
+
+But this is not our way of doing things. We do not want to touch hardware, we want to solve everything with server software only. So let’s do it!
+
+Pairing and initialization of Sonoff WiFi Wireless Smart Switch
+First of all, let’s do pairing. This is very straight forward, like any other smart device. Long click on manage button (let will start blinking fast). Look for wifi access point starting with “ITEAD-10000”. Connect to it with password “12345678”. Take into account, ITLead smart switch has time out in AP mode. If you will not configure it in given time, it closes AP and you should start all over again.
+
+Now when you connected, get device info by sending simple HTTP get request to http://10.10.7.1/device
+
+Another important point, gateway is not implemented in this hardware, so you should define route into 10.10.7.1. For example like that
+
+route change 0.0.0.0 mask 0.0.0.0 10.10.7.1
+As response you will get following JSON object
+
+{
+"deviceid":"10000xxxxx",
+"apikey":"xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+"accept":"post"
+}
+This is your API key and DeviceID. Store it, you will need it later
+
+Next call will configure default server for the device. Send HTTP POST message to
+
+http://10.10.7.1/ap
+The payload is following:
+
+{
+"version": 4,
+"ssid": [YOUR NETWORK SSID],
+"password": [YOUR NETWORK PASSWORD],
+"serverName": [IP OF YOUR SERVER],
+"port": [PORT OF YOUR SERVER]
+}
+Obviously, you have to run your webserver on the address you have provided, so device will be able to connect to it.
+
+Configuration of Sonoff WiFi Wireless Smart Switch on local network without internet access
+Now we are coming to the exciting part. Your server you should be HTTPS server. Sonoff official firmware below version 1.5.2 does not know to work with HTTP. It not really validates certificate, you create your own self-signed and it would be good enough for this device to connect. How we like to say: “S in IOT is for security…”
+
+
+When wifi relay will close AP and connect to your network, it will send HTTPS request Websockets configuration request to your server. Just answer to it with your websocket server configuration
+
+{
+"error": 0,
+"reason": "ok",
+"IP": [YOUR WEBSOCKET SERVER IP],
+"port": [YOUR WEBSOCKET SERVER PORT]
+}
+Also here, you need your websocket server to run. WebSocket server should also be “secured” by bogus certificate. And this would be enough to make device think that it works over real cloud, when the actual cloud is your local network.
+
+Controlling of original wifi smart switch on local network without Itead cloud
+There are 4 possible messages this relay is using for operation.
+
+First is “register”. Payload of it: deviceID, apikey and some additional information.
+
+Response would be just ACK, BUT with very secure new API Key (for example 111111111–1111–1111–1111–111111111111. Device does not really care about it. It will just send it back on each following request and will expect it back.
+
+{
+"error" : 0,
+"deviceid" : [ACTUAL DEVICE ID],
+"apikey" : "111111111-1111-1111-1111-111111111111"
+}
+Also here you can determinate the device type. First two digits of device id defines its type as following:
+
+01 — “smart switch relay” (our device)
+02 — “smart light” (another product of the same company, which behaviors the same, for example Slamper)
+03 — “temperature and humidity sensor”. For example CS. This one has no timers.
+Next is “date”. Response would be
+
+{
+"error" : 0,
+"date"  : [DATE IN ISO FORMAT],
+"deviceid" : [ACTUAL DEVICE ID],
+"apikey" : "111111111-1111-1111-1111-111111111111"
+}
+Then “query” for “timers” or any other parameters (sent in params property). Here you can response with timers to be setup on this device
+
+Another request is “update” — this is when device wants to tell you something (for example its state [on or off])
+
+So how to manage it?
+Simple. To turn it on or off, send
+
+{action: 'update', value: {switch : state?'on':'off'}
+over websocket
+
+To set or remove timers, response to “query” request or send “update” request with your times information.
+
+{action: 'update', value: {timers : d.timers}
+Format for timer setup is
+
+{
+enabled : true,
+type : 'once' OR 'repeat',
+at : time,
+do : {
+switch : 'on' OR 'off'
+}
+}
+To setup timer once, you should send type=”once” and at=time in ISO format. To setup repeat timer, send type=”repeat” and at=time in CRON format (e.g. “* * * * * *”).
+
+That all, we done, now you can use Sonoff wifi relay on your local network without any dependency on internet or ITLEAD cloud services without reflashing it or even opening your device. Just connect it to the system and use it.
+</body>
+</html>
