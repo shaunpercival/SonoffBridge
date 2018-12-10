@@ -89,6 +89,12 @@ p {
     margin-bottom: 12px;
 }
 
+.deviceOther {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
 .removeDevice {
     margin-top: 12px;
     text-align: center;
