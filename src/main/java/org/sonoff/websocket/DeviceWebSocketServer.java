@@ -37,6 +37,12 @@ import org.sonoff.model.Device;
 
 /**
  * https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/HomeWebsocket/WebsocketHome.html#section4
+ *
+ * https://docs.oracle.com/cd/E19798-01/821-1794/gfjwc/index.html
+ *
+ * http://localhost:8080/sonoffwebsockets/index.html#
+ * https://localhost:8181/sonoffwebsockets/index.html#
+     * http://localhost:4848
  */
 
 
@@ -48,9 +54,13 @@ public class DeviceWebSocketServer {
 //    static Logger log;
 
 
-    static Logger logger = LogManager.getRootLogger();
+    final static  Logger logger = LogManager.getLogger(DeviceWebSocketServer.class.getName());
 
 
+    static{
+        logger.info("Getting ready");
+        System.out.println("Getting Ready : Print console");
+    }
 
     //@Inject
     private DeviceSessionHandler sessionHandler = new DeviceSessionHandler();
@@ -132,6 +142,7 @@ public class DeviceWebSocketServer {
                     if ( device == null){
                         device = new Device();
                         device.setAPIKey(getJsonVariable(jsonMessage,"apikey"));
+                        device.setDeviceId("deviceid");
                     }
                     device.setVersion(getJsonVariable(jsonMessage,"romVersion"));
                     device.setModel(getJsonVariable(jsonMessage,"model"));

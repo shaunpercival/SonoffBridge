@@ -9,9 +9,11 @@ package org.sonoff.websocket;
  import java.util.Set;
  import javax.websocket.Session;
 
-import org.apache.logging.log4j.LogManager;
+  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  import org.sonoff.model.Device;
+ import org.sonoff.utils.SonoffProperties;
+
  import javax.json.Json;
  import javax.json.JsonObject;
  import javax.json.JsonReader;
@@ -31,7 +33,7 @@ public class DeviceSessionHandler {
 
 
 
-    static Logger logger = LogManager.getRootLogger();
+    final static Logger logger = LogManager.getLogger(DeviceSessionHandler.class.getName());
 
     public void addSession(Session session) {
         logger.info("addSession:" + session.getId());
@@ -59,7 +61,22 @@ public class DeviceSessionHandler {
     }
 
     public void handleSonoffRegisterRequest(Session session, Device device){
-        //sendToSession( session, JsonResponseMessage.createDateMessage(device));
+
+
+       String type = device.getDeviceId().substring(0,2);
+        switch (type) {
+            case "01" : device.setType("switch"); break;
+            case "02":  device.setType("light") ; break;
+            case "03'": device.setType("sensor");
+                //temperature and humidity. No timers here;
+                break;
+            default:
+                device.setType("unknown");
+                logger.warn("Device type not found");
+        }
+
+        SonoffProperties.persistDevice(device);
+        sendToSession( session, JsonResponseMessage.createRegisterResponseMessage(device));
     }
 
 

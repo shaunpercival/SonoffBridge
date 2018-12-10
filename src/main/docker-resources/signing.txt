@@ -1,0 +1,6 @@
+ keytool -genkey -keyalg RSA -alias tomcat -keystore selfsigned.jks -validity 365 -keysize 2048
+
+ The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using
+ "keytool -importkeystore -srckeystore selfsigned.jks -destkeystore selfsigned.jks -deststoretype pkcs12
+
+ https://community.pivotal.io/s/article/Generating-a-self-signed-SSL-certificate-using-the-Java-keytool-command

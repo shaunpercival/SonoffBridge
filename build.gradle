@@ -16,14 +16,23 @@ targetCompatibility = '1.8'
 version = '4.10.2'
 
 
+//println configurations.runtime.resolve();
+task doFirst(){
+ //   println sourceSets.main.runtimeClasspath.asPath
+ //   println $classpath
+}
+
+clean.dependsOn doFirst
 
 //sourceSets.test.resources.srcDirs += [ "src/test/resources" ]
-//sourceSets.main.resources.includes += [ "**/*.png" ]
+//sourceSets.main.resources.includes += [ "**/*.properties" ]
 
 
 configurations {
     provided
 }
+
+
 
 
 repositories {
@@ -39,6 +48,15 @@ dependencyManagement {
     }
 }
 
+//task copyTestResources(type: Copy) {
+//    from "${projectDir}/src/test/resources"
+//    into "${buildDir}/classes/java/test"
+//    println "Copied over \"${projectDir}/src/test/resources\" ${buildDir}/classes/java/test"
+//
+//    //sourceSets.main.runtimeClasspath.each { println it}
+//}
+//testClasses.dependsOn copyTestResources
+
 
 dependencies {
 
@@ -48,9 +66,10 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
     compile group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
-    provided group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
+    compile group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
 
     compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
     compile group: 'javax.enterprise', name: 'cdi-api', version: '2.0'
     compile group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
@@ -58,6 +77,9 @@ dependencies {
     testCompile('org.junit.jupiter:junit-jupiter-api:5.3.2')
     testCompile('org.junit.jupiter:junit-jupiter-params:5.3.2')
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.3.2')
+    testCompile('org.glassfish:javax.json:1.1.4')
+
+   // classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
 
 }
 
@@ -67,8 +89,6 @@ test {
         events "passed", "skipped", "failed"
     }
 }
-
-
 
 
 task echo{
@@ -84,6 +104,21 @@ war {
     archiveName = 'sonoffwebsockets.war'
 }
 
+
+task cleanWar( type:Exec) {
+    // workingDir "${glassfishHome${File.separator}bin"
+    workingDir "/opt/glassfish5/glassfish/bin"
+
+    //  if (System.properties['os.name'].toLowerCase().contains('windows')) {
+    //      commandLine 'cmd', '/c', 'asadmin.bat'
+    //  } else {
+
+    commandLine "./asadmin"
+    // }
+    args "undeploy",  "sonoffwebsockets"
+}
+
+//war.dependsOn cleanWar
 
 task run(dependsOn: 'war', type:Exec) {
    // workingDir "${glassfishHome${File.separator}bin"

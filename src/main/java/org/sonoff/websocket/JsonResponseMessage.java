@@ -29,6 +29,7 @@ public class JsonResponseMessage {
     static String J_PORT = "PORT";
     static String J_REASON = "reason";
 
+    final static Logger logger = LogManager.getLogger(JsonResponseMessage.class.getName());
 
 
     private static JsonObjectBuilder getSonoffBaseResponse(Device device){

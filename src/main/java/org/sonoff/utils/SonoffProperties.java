@@ -1,5 +1,6 @@
 package org.sonoff.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,41 +16,73 @@ import java.util.Properties;
  */
 public class SonoffProperties {
 
-   public static final String SONOFFWS_PROPERTIES = "/home/bearingpoint/wk-devops/SonoffWebSockets/src/main/resources/sonoffws.properties";
-   public static final String SONOFF_APP_PROPERTIES = "/home/bearingpoint/wk-devops/SonoffWebSockets/src/main/resources/devices.properties";
+
+//    public static final String SONOFFWS_PROPERTIES  = "src/test/resources/sonoffws.properties";
+//    public static final String SONOFF_APP_PROPERTIES = "src/test/resources/devices.properties";
+
+    private static Logger logger = LogManager.getLogger(SonoffProperties.class.getName());
+
+
+    public static  String SONOFFWS_PROPERTIES  = "sonoffws.properties";
+   public static  String SONOFF_APP_PROPERTIES = "devices.properties";
    private static Properties applicationProps;
    private static Properties deviceProperties;
 
-   static Logger log = LogManager.getRootLogger();
+    public static void setSonofWSproperties(String value){
+        SONOFFWS_PROPERTIES = value;
+    }
+
+
+    public static void setSonoffDeviceproperties(String value){
+        SONOFF_APP_PROPERTIES = value;
+    }
+
+
+    public static Properties getApplicationProps() {
+        return applicationProps;
+    }
+
+    public static void setApplicationProps(Properties applicationProps) {
+        SonoffProperties.applicationProps = applicationProps;
+    }
+
+    public static Properties getDeviceProperties() {
+        return deviceProperties;
+    }
+
+    public static void setDeviceProperties(Properties deviceProperties) {
+        SonoffProperties.deviceProperties = deviceProperties;
+    }
+
 
    public static void loadProperties(){
        try {
            Properties defaultProps = new Properties();
-           log.info("Properties - 0");
+           logger.info("Properties - 0");
            FileInputStream in = new FileInputStream(SONOFFWS_PROPERTIES);
-           log.info("Properties - 1");
+           logger.info("Properties - 1");
            defaultProps.load(in);
            in.close();
-           log.info("Properties - 2");
+           logger.info("Properties - 2");
            // create application properties with default
            applicationProps = new Properties(defaultProps);
 
            // now load properties
            // from last invocation
            in = new FileInputStream(SONOFF_APP_PROPERTIES);
-           log.info("Properties - 3");
+           logger.info("Properties - 3");
            deviceProperties = new Properties();
            deviceProperties.load(in);
            in.close();
 
-           log.info("Properties loaded");
+           logger.info("Properties loaded");
 
        } catch (FileNotFoundException e) {
-           log.error(e);
-           log.error(e.fillInStackTrace());
+           logger.error(e);
+           logger.error(e.fillInStackTrace());
        } catch (IOException e) {
            e.printStackTrace();
-           log.error(e);
+           logger.error(e);
        }
 
 
@@ -59,13 +92,23 @@ public class SonoffProperties {
     static {loadProperties();}
 
 
-    public static void persisteProperties(Device device){
+    public static void persistDevice(Device device){
+        loadProperties();
+        try {
+            String deviceToString = null;
+            deviceToString = new ObjectMapper().writeValueAsString(device);
+            persistProperty(device.getDeviceId(),deviceToString);
+        } catch (JsonProcessingException e) {
+             logger.error(e);
+        }
+
 
     }
 
     public static void persistProperty(String param, String value){
         deviceProperties.put(param,value);
         saveProperties();
+        logger.info("persistProperty: " + param);
     }
 
     private static void saveProperties(){
@@ -76,9 +119,9 @@ public class SonoffProperties {
             out.close();
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
 
     }

@@ -7,7 +7,7 @@
 window.onload = init;
 
 
-var socket = new WebSocket("ws://localhost:9080/sonoffwebsockets/actions");
+var socket = new WebSocket("wss://localhost:9443/sonoffwebsockets/actions");
 //var socket = new WebSocket("ws://localhost:8080/WebsocketHome/actions");
 
 socket.onmessage = onMessage;

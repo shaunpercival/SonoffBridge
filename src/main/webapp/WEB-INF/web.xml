@@ -4,6 +4,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <!--
 
     <listener>
         <listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
@@ -13,6 +14,7 @@
         <filter-name>log4jServletFilter</filter-name>
         <filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
     </filter>
+
     <filter-mapping>
         <filter-name>log4jServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -22,8 +24,14 @@
         <dispatcher>ERROR</dispatcher>
         <dispatcher>ASYNC</dispatcher>
     </filter-mapping>
+    -->
+   <!--
 
-
+    <context-param>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>file://log4j2.xml</param-value>
+    </context-param>
+ -->
     <!-- Servlet 3.0 w/ disabled auto-initialization only; not supported in 2.5 -->
 
 </web-app>

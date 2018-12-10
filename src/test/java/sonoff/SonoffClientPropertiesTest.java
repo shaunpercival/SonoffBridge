@@ -4,13 +4,18 @@ package sonoff;
  * Created by bearingpoint on 28/11/18.
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.sonoff.model.Device;
 import org.sonoff.utils.SonoffProperties;
+
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SonoffClientPropertiesTest {
 
@@ -41,9 +46,31 @@ public class SonoffClientPropertiesTest {
     @Test
     void testPropertiesLoadTest() {
 
-        SonoffProperties.loadProperties();
-        SonoffProperties.persistProperty("test1","value1");
-        log.info("Success");
+        String testKey = "device-test1";
+
+
+        SonoffProperties.setSonofWSproperties( "src/test/resources/sonoffws.properties");
+        SonoffProperties.setSonoffDeviceproperties("src/test/resources/devices.properties");
+
+        try {
+
+            Device device = new Device();
+            String device1 = new ObjectMapper().writeValueAsString(device);
+            SonoffProperties.loadProperties();
+            SonoffProperties.persistProperty(testKey, device1);
+            log.info("Success");
+
+            SonoffProperties.loadProperties();
+            Properties prop = SonoffProperties.getDeviceProperties();
+            String testValueRetrieved = prop.getProperty(testKey);
+
+            assertEquals(device1.toString(), testValueRetrieved);
+
+        }catch (Exception e){
+            log.error(e);
+            fail("Failed" + e.getCause());
+        }
+
     }
 
     @Test

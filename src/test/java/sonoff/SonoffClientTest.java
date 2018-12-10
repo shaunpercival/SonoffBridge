@@ -11,6 +11,13 @@ import org.junit.jupiter.api.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sonoff.model.Device;
+
+import javax.json.JsonObject;
+
+//import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.sonoff.model.DeviceParams;
 
 public class SonoffClientTest {
 
@@ -37,10 +44,45 @@ public class SonoffClientTest {
 //    }
 
 
-    @DisplayName("Single test successful")
+    @DisplayName("Test JSON encoding")
     @Test
     void testSingleSuccessTest() {
+
+
+        try {
+
+            String P_PARAM1 = "P_PARAM1";
+            String P_PARAM2 = "P_PARAM2";
+            String P_VALUE1 = "P_VALUE1";
+            String P_VALUE2 = "P_VALUE2";
+
+            Device device = new Device();
+
+
+            DeviceParams params1 = new DeviceParams();
+            params1.setKey(P_PARAM1);
+            params1.setValue(P_VALUE1);
+            DeviceParams params2 = new DeviceParams();
+            params2.setKey(P_PARAM2);
+            params2.setValue(P_VALUE2);
+
+            device.putDeviceParam(params1);
+            device.putDeviceParam(params2);
+
+            String device1 = new ObjectMapper().writeValueAsString(device);
+            Device deviceMirror = new ObjectMapper().readValue(device1, Device.class);
+
+            log.info("device1-"+ device1);
+            log.info("deviceM-"+ new ObjectMapper().writeValueAsString(deviceMirror));
+
+        }catch(Exception e){
+            e.getStackTrace();
+            log.error(e.fillInStackTrace());
+            fail();
+        }
+
         log.info("Success");
+
     }
 
     @Test

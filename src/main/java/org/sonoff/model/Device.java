@@ -1,18 +1,60 @@
 package org.sonoff.model;
 
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.spi.JsonProvider;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class Device {
 
-    private int id;
-    private String name;
-    private String status;
-    private String type;
-    private String description;
+    private int id = 0;
+    private String name = "<not assigned>";
+    private String status = "<not assigned>";
+    private String type = "<not assigned>";
+    private String description= "<not assigned>" ;
 
     // Sonoff
-    private String apiKey;
-    private String deviceId;
-    private String version;
-    private String model;
+    private String apiKey = "<not assigned>";
+    private String deviceId= "<not assigned>";
+    private String version= "<not assigned>";
+    private String model= "<not assigned>";
+
+    private List<DeviceParams> deviceParamsList = new ArrayList<DeviceParams>();
+
+    public List<DeviceParams> getDeviceParamsList() {
+        return deviceParamsList;
+    }
+
+    public void putDeviceParam(DeviceParams deviceParams) {
+        deviceParamsList.add(deviceParams);
+    }
+
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public void setDeviceParamsList(List<DeviceParams> deviceParamsList) {
+        this.deviceParamsList = deviceParamsList;
+    }
+
+    // mETA DATA
+    private Date lastUpdated = new Date();
 
     public String getDeviceId() {
         return deviceId;
@@ -38,15 +80,7 @@ public class Device {
         this.model = model;
     }
 
-    public String getDeviceid() {
-        return deviceid;
-    }
 
-    public void setDeviceid(String deviceid) {
-        this.deviceid = deviceid;
-    }
-
-    private String deviceid;
 
     public String getAPIKey() {
         return apiKey;
@@ -83,6 +117,22 @@ public class Device {
     }
 
 
+
+
+    @Override
+    public String toString() {
+        return "Device{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", status='" + status + '\'' +
+                ", type='" + type + '\'' +
+                ", description='" + description + '\'' +
+                ", apiKey='" + apiKey + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", version='" + version + '\'' +
+                ", model='" + model + '\'' +
+                '}';
+    }
 
     public void setId(int id) {
         this.id = id;

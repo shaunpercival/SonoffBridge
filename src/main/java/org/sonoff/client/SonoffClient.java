@@ -7,7 +7,7 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
-import java.util.logging.SimpleFormatter;
+//import java.util.logging.SimpleFormatter;
 import javax.json.JsonObject;
 import javax.websocket.*;
 
