@@ -5,7 +5,7 @@
             <PatternLayout pattern="%d{dd HH:mm:ss.SSS} console-shaun [%t] %-5level %logger{36} - %msg%n" />
         </Console>
         <File name="ws" fileName="/tmp/ws.log">
-            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} file-shaun[%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%d{MM-dd HH:mm:ss.SSS} %L [%t] %-5level %c{1} - %msg%n"/>
         </File>
     </Appenders>
     <Loggers>

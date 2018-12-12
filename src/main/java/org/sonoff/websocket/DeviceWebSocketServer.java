@@ -109,13 +109,13 @@ public class DeviceWebSocketServer {
         return 0;
     }
 
-    private String getJsonVariable(JsonObject jsonMessage ,String param){
+    private String getJsonVariable(JsonObject jsonMessage ,String paramKey){
         try{
-            return jsonMessage.getString("param");
+            return jsonMessage.getString(paramKey);
         } catch (Exception e) {
-            logger.warn("Error extracting param: " + param + " " + e.getMessage());
+            logger.warn("Error extracting param: " + paramKey + " " + e.getMessage());
         }
-        return null;
+        return "";
     }
 
 
@@ -131,8 +131,12 @@ public class DeviceWebSocketServer {
             String action = jsonMessage.getString("action");
             logger.info("here 0");
 
-            Device device = sessionHandler.getDevice(jsonMessage.getString(J_DEVICE_ID));
+            Device device = sessionHandler.getDevice(getJsonVariable(jsonMessage,J_DEVICE_ID));
             switch(action){
+                case "refresh" : {
+                    sessionHandler.handleRefeshDeviceList(session);
+                    break;
+                }
                 case "date":{
                     sessionHandler.handleSonoffDateRequest(session,device);
                     break;
@@ -141,27 +145,17 @@ public class DeviceWebSocketServer {
 
                     if ( device == null){
                         device = new Device();
-                        device.setAPIKey(getJsonVariable(jsonMessage,"apikey"));
-                        device.setDeviceId("deviceid");
+                        device.setAPIKey(getJsonVariable(jsonMessage,JsonResponseMessage.J_API_KEY));
+                        device.setDeviceId(getJsonVariable(jsonMessage, J_DEVICE_ID));
                     }
-                    device.setVersion(getJsonVariable(jsonMessage,"romVersion"));
-                    device.setModel(getJsonVariable(jsonMessage,"model"));
-                    sessionHandler.handleSonoffRegisterRequest(session,device);
+                    device.setName(getJsonVariable(jsonMessage,JsonResponseMessage.J_NAME));
+                    device.setVersion(getJsonVariable(jsonMessage, "romVersion"));
+                    device.setModel(getJsonVariable(jsonMessage,JsonResponseMessage.J_MODEL));
+                    sessionHandler.handleSonoffRegisterRequest(session, device);
+                    break;
 
 
                 }
-//                    var device = {
-//                            id : data.deviceid
-//                    };
-//                    var type = data.deviceid.substr(0, 2);
-//                    if(type == '01') device.kind = 'switch';
-//                    else if(type == '02') device.kind = 'light';
-//                    else if(type == '03') device.kind = 'sensor'; //temperature and humidity. No timers here;
-//                    device.version = data.romVersion;
-//                    device.model = data.model;
-//                    self._updateKnownDevice(self,device);
-//                    console.log('INFO | WS | Device %s registered', device.id);
-                    break;
                 case "query": {
                     //device wants information on timers
 //                var device = self._knownDevices.find(d=>d.id == data.deviceid);
@@ -190,9 +184,8 @@ public class DeviceWebSocketServer {
             }
 
             if ("add".equals(action)) {
-                logger.info("here 0.1");
+
                  device = new Device();
-                logger.info("here 0.2");
                 device.setName(jsonMessage.getString("name"));
                 device.setDescription(jsonMessage.getString("description"));
                 device.setType(jsonMessage.getString("type"));
@@ -214,9 +207,7 @@ public class DeviceWebSocketServer {
                 sessionHandler.toggleDevice(id);
             }
         }catch(Exception e){
-            logger.info("what: " + e.getStackTrace().toString());
-            e.printStackTrace();
-            logger.error(e);
+            logger.error(e.getMessage(),e);
         }
     }
 }

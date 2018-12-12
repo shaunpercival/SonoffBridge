@@ -14,31 +14,36 @@ socket.onmessage = onMessage;
 
 function onMessage(event) {
     var device = JSON.parse(event.data);
+
     if (device.action === "add") {
         printDeviceElement(device);
     }
     if (device.action === "remove") {
-        document.getElementById(device.id).remove();
+        if (document.getElementById(device.deviceid) != null ) {
+            document.getElementById(device.deviceid).remove();
+        }else{
+            console.log("Div content was null");
+        }
         //device.parentNode.removeChild(device);
     }
     if (device.action === "toggle") {
-        var node = document.getElementById(device.id);
+        var node = document.getElementById(device.deviceid);
         var statusText = node.children[2];
         if (device.status === "On") {
-            statusText.innerHTML = "Status: " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.id + ")>Turn off</a>)";
+            statusText.innerHTML = "Status: " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.deviceid + ")>Turn off</a>)";
         } else if (device.status === "Off") {
-            statusText.innerHTML = "Status: " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.id + ")>Turn on</a>)";
+            statusText.innerHTML = "Status: " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.deviceid + ")>Turn on</a>)";
         }
     }
 }
 
-function registerDevice(name, type, description, deviceId, romVersion, model, apiKey) {
+function registerDevice(name, type, description, deviceid, romVersion, model, apiKey) {
     var DeviceAction = {
         action: "register",
         name: name,
         type: type,
-        id: null,
-        deviceid: deviceId,
+        id: deviceid,
+        deviceid: deviceid,
         apikey: apiKey,
         romVersion: romVersion,
         model: model,
@@ -46,23 +51,13 @@ function registerDevice(name, type, description, deviceId, romVersion, model, ap
     };
     socket.send(JSON.stringify(DeviceAction));
 
-    if ( device == null){
-        device = new Device();
-        device.setAPIKey(getJsonVariable(jsonMessage,"apikey"));
-        device.setDeviceId("deviceid");
-    }
-    device.setVersion(getJsonVariable(jsonMessage,"romVersion"));
-    device.setModel(getJsonVariable(jsonMessage,"model"));
-    sessionHandler.handleSonoffRegisterRequest(session,device);
-
-
 }
 
 function removeDevice(element) {
     var id = element;
     var DeviceAction = {
         action: "remove",
-        id: id
+        deviceid: id
     };
     socket.send(JSON.stringify(DeviceAction));
 }
@@ -71,7 +66,7 @@ function toggleDevice(element) {
     var id = element;
     var DeviceAction = {
         action: "toggle",
-        id: id
+        deviceid: id
     };
     socket.send(JSON.stringify(DeviceAction));
 }
@@ -80,7 +75,7 @@ function printDeviceElement(device) {
     var content = document.getElementById("content");
 
     var deviceDiv = document.createElement("div");
-    deviceDiv.setAttribute("id", device.id);
+    deviceDiv.setAttribute("id", device.deviceid);
     deviceDiv.setAttribute("class", "device " + device.type);
     content.appendChild(deviceDiv);
 
@@ -89,15 +84,21 @@ function printDeviceElement(device) {
     deviceName.innerHTML = device.name;
     deviceDiv.appendChild(deviceName);
 
-    var deviceId = document.createElement("span");
-    deviceId.setAttribute("class", "deviceOther");
-    deviceId.innerHTML = device.deviceid;
-    deviceId.appendChild(deviceId);
+    var model1 = document.createElement("span");
+    model1.setAttribute("class", "deviceOther");
+    model1.innerHTML = "model: " +  device.model;
+    deviceDiv.appendChild(model1);
 
-    //var deviceName = document.createElement("span");
-    //deviceName.setAttribute("class", "deviceName");
-    //deviceName.innerHTML = device.name;
-    //deviceDiv.appendChild(deviceName);
+    var apikey = document.createElement("span");
+    apikey.setAttribute("class", "deviceOther");
+    apikey.innerHTML = "api: " + device.apikey;
+    deviceDiv.appendChild(apikey);
+
+    var deviceid = document.createElement("span");
+    deviceid.setAttribute("class", "deviceOther");
+    deviceid.innerHTML = "deviceid: " + device.deviceid;
+    deviceDiv.appendChild(deviceid);
+
     //
     //var deviceName = document.createElement("span");
     //deviceName.setAttribute("class", "deviceName");
@@ -106,7 +107,7 @@ function printDeviceElement(device) {
     //
     //type: type,
     //    id: null,
-    //    deviceid: deviceId,
+    //    deviceid: deviceid,
     //    apikey: apiKey,
     //    romVersion: romVersion,
     //    model: model,
@@ -147,14 +148,22 @@ function formSubmit() {
     var form = document.getElementById("addDeviceForm");
     var name = form.elements["device_name"].value;
     var type = form.elements["device_type"].value;
-    var deviceId =form.elements["deviceId"].value;
+    var deviceid =form.elements["deviceid"].value;
     var apikey =form.elements["apikey"].value;
     var romVersion =form.elements["romVersion"].value;
     var model =form.elements["model"].value;
     var description = form.elements["device_description"].value;
     hideForm();
     document.getElementById("addDeviceForm").reset();
-    registerDevice(name, type, description, deviceId, romVersion, model, apikey)
+    registerDevice(name, type, description, deviceid, romVersion, model, apikey)
+}
+
+
+function formRefresh(){
+    var PageACtion = {
+        action: "refresh"
+    };
+    socket.send(JSON.stringify(PageACtion));
 }
 
 function init() {

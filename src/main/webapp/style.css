@@ -100,6 +100,51 @@ p {
     text-align: center;
 }
 
+
+
+
+
+
+.device.light {
+    background-color: #c2a00c;
+}
+
+.device.light a:hover {
+    color: #fad232;
+}
+
+.device.sensor {
+    background-color: #0f90d1;
+}
+
+.device.sensor a:hover {
+    color: #4badd1;
+}
+
+.device.switch {
+    background-color: #5eb85e;
+}
+
+.device.switch a:hover {
+    color: #a1ed82;
+}
+
+/** to go - start
+.device.Lights {
+    background-color: #c2a00c;
+}
+
+.device.Lights a:hover {
+    color: #fad232;
+}
+
+.device.Electronics {
+    background-color: #0f90d1;
+}
+
+.device.Electronics a:hover {
+    color: #4badd1;
+}
 .device.Appliance {
     background-color: #5eb85e;
 }
@@ -116,13 +161,7 @@ p {
     color: #4badd1;
 }
 
-.device.Lights {
-    background-color: #c2a00c;
-}
-
-.device.Lights a:hover {
-    color: #fad232;
-}
+*/
 
 .device.Other {
     background-color: #db524d;

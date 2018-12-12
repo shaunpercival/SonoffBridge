@@ -29,7 +29,7 @@ public class DeviceSessionHandler {
 
     private static int deviceId = 0;
     private static final Set<Session> sessions = new HashSet<>();
-    private static final Set<Device> devices = new HashSet<>();
+    private static Set<Device> devices = new HashSet<>();
 
 
 
@@ -40,7 +40,7 @@ public class DeviceSessionHandler {
         sessions.add(session);
         for (Device device : devices) {
             logger.info("addSession:Notifing device: " + device.getName());
-            JsonObject addMessage = createAddDeviceMessage(device);
+            JsonObject addMessage = JsonResponseMessage.getAddDeviceJsonObject(device);
             sendToSession(session, addMessage);
         }
 
@@ -74,11 +74,34 @@ public class DeviceSessionHandler {
                 device.setType("unknown");
                 logger.warn("Device type not found");
         }
+        if (  device.getId() == 0) {
+            device.setId(deviceId);
+            deviceId++;
+        }
 
         SonoffProperties.persistDevice(device);
-        sendToSession( session, JsonResponseMessage.createRegisterResponseMessage(device));
+        devices.add(device);
+        JsonObject jsonResponse = JsonResponseMessage.createRegisterResponseMessage(device);
+        logger.info("RegisterResponse JSON -- " + jsonResponse);
+        sendToSession(session, jsonResponse);
     }
 
+    public void handleRefeshDeviceList(Session session){
+
+        devices = SonoffProperties.getDeviceSet();
+
+        for (Device device : devices){
+             logger.info("Refreshing device for session" + device.getDeviceId());
+             logger.info(device.toString());
+             JsonObject jsonRemoveObject = JsonResponseMessage.getDeleteJsonMessage(device);
+             sendToSession( session,  jsonRemoveObject);
+             JsonObject jsonAddObject = JsonResponseMessage.getAddDeviceJsonObject(device);
+             sendToSession( session,  jsonAddObject);
+        }
+
+
+
+    }
 
 
     public void addDevice(Device device) {
@@ -88,7 +111,7 @@ public class DeviceSessionHandler {
             deviceId++;
         }
         devices.add(device);
-        JsonObject addMessage = createAddDeviceMessage(device);
+        JsonObject addMessage = JsonResponseMessage.getAddDeviceJsonObject(device);
         logger.info("addDevice::sendToAllConnections: " + device.getName());
         sendToAllConnectedSessions(addMessage);
     }
@@ -98,11 +121,7 @@ public class DeviceSessionHandler {
         Device device = getDeviceById(id);
         if (device != null) {
             devices.remove(device);
-            JsonProvider provider = JsonProvider.provider();
-            JsonObject removeMessage = provider.createObjectBuilder()
-                    .add("action", "remove")
-                    .add("id", id)
-                    .build();
+            JsonObject removeMessage = JsonResponseMessage.getDeleteJsonMessage(device);
             sendToAllConnectedSessions(removeMessage);
         }
     }
@@ -145,18 +164,6 @@ public class DeviceSessionHandler {
         return null;
     }
 
-    public JsonObject createAddDeviceMessage(Device device) {
-        JsonProvider provider = JsonProvider.provider();
-        JsonObject addMessage = provider.createObjectBuilder()
-                .add("action", "add")
-                .add("id", device.getId())
-                .add("name", device.getName())
-                .add("type", device.getType())
-                .add("status", device.getStatus())
-                .add("description", device.getDescription())
-                .build();
-        return addMessage;
-    }
 
     private void sendToAllConnectedSessions(JsonObject message) {
         logger.info("sendToAllConnectedSessions: size:" + sessions.size());
@@ -170,9 +177,8 @@ public class DeviceSessionHandler {
         try {
             session.getBasicRemote().sendText(message.toString());
         } catch (IOException ex) {
-            logger.info("error::sendToSession-> removeSession");
             sessions.remove(session);
-            logger.error(ex);
+            logger.error(ex.getMessage(),ex);
         }
     }
 

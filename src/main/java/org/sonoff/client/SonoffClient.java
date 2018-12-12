@@ -2,6 +2,7 @@ package org.sonoff.client;
 
 import org.sonoff.model.Device;
 import org.sonoff.websocket.DeviceSessionHandler;
+import org.sonoff.websocket.JsonResponseMessage;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -61,7 +62,7 @@ public class SonoffClient  {
              device.setType("Appliance");
              device.setDescription("test");
 
-             JsonObject addMessage = new DeviceSessionHandler().createAddDeviceMessage(device);
+             JsonObject addMessage = JsonResponseMessage.getAddDeviceJsonObject(device);
 
              session.getAsyncRemote().sendObject(addMessage);
 

@@ -162,7 +162,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends vim
 COPY src/docker-resources/tomcat-users.xml /usr/local/tomcat/conf
 COPY src/docker-resources/selfsigned.jks /usr/local/tomcat/conf
 COPY src/docker-resources/server.xml /usr/local/tomcat/conf
-COPY src/build/libs/sonoffwebsockets.war /usr/local/tomcat/webapps
+#RUN /bin/bash -c "mkdir -p /sonoff"
 
 
 # verify Tomcat Native is working properly
@@ -174,6 +174,14 @@ RUN set -e \
 		echo >&2 "$nativeLines"; \
 		exit 1; \
 	fi
+
+COPY marker /dev/null
+COPY src/main/resources/sonoffws.properties /usr/local/tomcat/conf
+COPY src/main/resources/devices.properties /usr/local/tomcat/conf
+#force rebuild
+
+COPY build/libs/sonoffwebsockets.war /usr/local/tomcat/webapps
+
 
 EXPOSE 9080
 EXPOSE 9443
