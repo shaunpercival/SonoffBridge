@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+
+// -------------- windows
+//ITEAD-1000222565
+//
+//netsh wlan set hostednetwork mode=allow ssid=ITEAD-1000222565 key=12345678
+//netsh wlan start hostednetwork
+//netsh wlan stop hostednetwork
+//netsh wlan show hostednetwork
+//
+//
+//C:\Users\shaun.percival\Documents\vm-share>java -cp sonoffwebsockets.jar org.sooff.httpserver.HTTPSonoffEmulator 10.10.7.1 80
+
+
 jre=/usr/lib/jvm/java-1.9.0-openjdk-amd64/bin/java
 
 build_dir=/home/bearingpoint/wk-devops/SonoffWebSockets/build/classes/java/main/
@@ -25,4 +38,5 @@ proj_cp=$log4j_jar:$onejar:$twojar:$build_dir
 echo "cp" + $proj_cp
 echo "hi shaun"
 $jre -version
-$jre -cp $proj_cp org.sonoff.client.HTTPSonoffMockServer
+$jre -cp $proj_cp org.sonoff.httpserver.HTTPSonoffEmulator
+

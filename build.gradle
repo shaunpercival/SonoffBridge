@@ -132,6 +132,14 @@ war {
 
 }
 
+//------------------------------------------------------
+// Emulator
+task copyToMnt(type: Copy) {
+    from 'build/libs/sonoffwebsockets.jar'
+    into '/media/sf_vm-share'
+}
+
+
 // ------------------------------------------------------
 // -- Remote TOMCAT
 
@@ -181,6 +189,10 @@ task undeployLocalTomcat( type:Exec) {
     commandLine "./wget"
     args "undeploy",  "sonoffwebsockets"
 }
+
+
+
+
 
 //---------------------------------------------------
 // - Local Glassfish testing

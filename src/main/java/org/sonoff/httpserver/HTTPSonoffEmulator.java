@@ -15,12 +15,13 @@ import java.util.*;
 public class HTTPSonoffEmulator {
 
     private static int port = 80;
+    private static String host = "0.0.0.0";
 
     private  void startServer(){
         try {
 
-            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            System.out.println("server started at " + port);
+            HttpServer server = HttpServer.create(new InetSocketAddress(host,port), 0);
+            System.out.println("server started at " + port  + " : "  + host);
             server.createContext("/", new RootHandler());
             server.createContext("/device", new DeviceHandler());
             server.createContext("/ap", new APPostHandler());
@@ -43,9 +44,14 @@ public class HTTPSonoffEmulator {
             Map<String, Object> parameters = new HashMap<String, Object>();
             InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
-            String query = br.readLine();
-
-            System.out.println("query: " + query);
+            String query ;
+            String result = "";
+            while ((query = br.readLine()) != null){
+                result += query;
+            }
+            System.out.println("Root handler: " + new Date());
+            System.out.println("Query: " + result);
+            System.out.println("url" + he.getRequestURI());
 
             String response = "<h1>Server start success"+
             "if you see this message</h1>" + "<h1>Port: " + port + "</h1>";
@@ -58,10 +64,13 @@ public class HTTPSonoffEmulator {
 
     public static void main(String[] args) {
 
-        if ( args.length == 1){
-            port = Integer.getInteger(args[0]);
+        if ( args.length == 2){
+            System.out.println("args: " + args[0] + " "+  args[1]);
+            host = args[0];
+            port = Integer.parseInt(args[1]);
+
         }else{
-            System.out.println("Using default port " + port);
+            System.out.println("Using default port-> " + port + " : host->  " + host);
         }
         HTTPSonoffEmulator server = new HTTPSonoffEmulator();
         server.startServer();
@@ -75,6 +84,7 @@ public class HTTPSonoffEmulator {
         public void handle(HttpExchange he) throws IOException {
             // parse request
             Map<String, Object> parameters = new HashMap<String, Object>();
+            System.out.println("Received /device call "  + new Date());
             String response = "{ \"deviceid\":\"1000222565\", \"apikey\": \"cea052a6-4a49-41f4-be5b-f3db537376bc\", \"accept\":\"post\" }";
             Headers headers = he.getResponseHeaders();
             headers.set("Content-Type", "application/json");
@@ -95,9 +105,15 @@ public class HTTPSonoffEmulator {
             Map<String, Object> parameters = new HashMap<String, Object>();
             InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
-            String query = br.readLine();
+            String query ;
+            String result = "";
+            while ((query = br.readLine()) != null){
+                result += query;
+            }
 
-            System.out.println("query: " + query);
+            System.out.println("Received /ap call"  + new Date());
+
+            System.out.println("query: " + result);
 
 
             parseQuery(query, parameters);
