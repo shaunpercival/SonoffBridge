@@ -111,24 +111,7 @@ test {
 }
 
 
-remotes {
-    webServer {
-        host = '192.168.1.180'
-        user = 'tomcat'
-        identity = file('id_rsa')
-    }
-}
 
-task deploy {
-    doLast {
-        ssh.run {
-            session(remotes.webServer) {
-                put from: 'build/libs/sonoffwebsockets.war', into: '/tmp'
-                //execute 'sudo service tomcat restart'
-            }
-        }
-    }
-}
 
 
 task echo{
@@ -149,63 +132,72 @@ war {
 
 }
 
-// https://localhost:9443/docs/manager-howto.html#Deploy_a_Directory_or_WAR_by_URL
-// https://localhost:9443/manager/text/deploy?path=/sonoffwebsockets&war=file:/tmp/sonoff-webapps/sonoffwebsockets.war
-//https://localhost:9443/manager/text/deploy?update=true&path=/tmp/sonoff-webapps/sonoffwebsockets.war
+// ------------------------------------------------------
+// -- Remote TOMCAT
 
+
+// First run build-dockers.sh on remote host
+
+remotes {
+    webServer {
+        host = '192.168.1.180'
+        user = 'tomcat'
+        identity = file('id_rsa')
+    }
+}
+// First push WAR file
+task deployPI {
+    doLast {
+        ssh.run {
+            session(remotes.webServer) {
+                put from: 'build/libs/sonoffwebsockets.war', into: '/tmp'
+                //execute 'sudo service tomcat restart'
+            }
+        }
+    }
+}
+
+// Second : Undeploy old one
 // works: https://localhost:9443/manager/text/undeploy?path=/sonoffwebsockets
 // works: https://localhost:9443/manager/text/deploy?path=/sonoffwebsockets&war=file:/tmp/sonoff-webapps/sonoffwebsockets.war
+
+// Third deploy new one
+// works: https://192.168.1.180:9443/manager/text/undeploy?path=/sonoffwebsockets
 // works: https://192.168.1.180:9443/manager/text/deploy?path=/sonoffwebsockets&war=file:/tmp/sonoff-webapps/sonoffwebsockets.war
 
 
 
-
+//------------------------------------------------------------
+// - Local TOMCAT deployments
 task deployLocalTomcat(type: Copy) {
     from 'build/libs/sonoffwebsockets.war'
     into '/tmp/sonoff-webapps'
 }
 
 
+task undeployLocalTomcat( type:Exec) {
+    // workingDir "${glassfishHome${File.separator}bin"
+    workingDir "/opt/glassfish5/glassfish/bin"
+    commandLine "./wget"
+    args "undeploy",  "sonoffwebsockets"
+}
+
+//---------------------------------------------------
+// - Local Glassfish testing
+//
 task cleanWar( type:Exec) {
     // workingDir "${glassfishHome${File.separator}bin"
     workingDir "/opt/glassfish5/glassfish/bin"
-
-
     commandLine "./asadmin"
     args "undeploy",  "sonoffwebsockets"
 
-
-
 }
-
-task undeployTomcat( type:Exec) {
-    // workingDir "${glassfishHome${File.separator}bin"
-    workingDir "/opt/glassfish5/glassfish/bin"
-
-
-    commandLine "./wget"
-    args "undeploy",  "sonoffwebsockets"
-
-
-
-}
-
-
-
 //war.dependsOn cleanWar
 
 task run(dependsOn: 'war', type:Exec) {
    // workingDir "${glassfishHome${File.separator}bin"
     workingDir "/opt/glassfish5/glassfish/bin"
-
-  //  if (System.properties['os.name'].toLowerCase().contains('windows')) {
-  //      commandLine 'cmd', '/c', 'asadmin.bat'
-  //  } else {
-
     commandLine "./asadmin"
-   // }
     args "deploy", "--force=true", "/home/bearingpoint/wk-devops/SonoffWebSockets/build/libs/sonoffwebsockets.war"
- }
+}
 
-
-//https://gradle-ssh-plugin.github.io/

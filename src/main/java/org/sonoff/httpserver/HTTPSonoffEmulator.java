@@ -1,4 +1,4 @@
-package org.sonoff.org.sonoff.httpserver;
+package org.sonoff.httpserver;
 
 
 import com.sun.net.httpserver.Headers;
@@ -9,7 +9,6 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.util.*;
 
