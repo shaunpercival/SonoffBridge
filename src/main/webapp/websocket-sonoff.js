@@ -7,7 +7,7 @@
 window.onload = init;
 
 
-var socket = new WebSocket("wss://localhost:9443/sonoffwebsockets/actions");
+var socket = new WebSocket("wss://192.168.1.180:9443/sonoffwebsockets/actions");
 
 
 socket.onmessage = onMessage;
@@ -17,16 +17,14 @@ function onMessage(event) {
 
     if (device.action === "add") {
         printDeviceElement(device);
-    }
-    if (device.action === "remove") {
+    }else if (device.action === "remove") {
         if (document.getElementById(device.deviceid) != null ) {
             document.getElementById(device.deviceid).remove();
         }else{
             console.log("Div content was null");
         }
         //device.parentNode.removeChild(device);
-    }
-    if (device.action === "toggle") {
+    }else if (device.action === "toggle") {
         var node = document.getElementById(device.deviceid);
         var statusText = node.children[2];
         if (device.status === "On") {
@@ -34,6 +32,8 @@ function onMessage(event) {
         } else if (device.status === "Off") {
             statusText.innerHTML = "Status: " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.deviceid + ")>Turn on</a>)";
         }
+    }else{
+        printDeviceStats(device);
     }
 }
 
@@ -71,6 +71,22 @@ function toggleDevice(element) {
     socket.send(JSON.stringify(DeviceAction));
 }
 
+function printDeviceStats(device) {
+    var stats = document.getElementById("stats");
+    console.log("WS Response: apikey: "  + device.apikey + " deviceid:" + device.deviceid + " error:" + device.error + " IP: " + device.IP);
+    stats.innerHTML = "WS: apikey: "  + device.apikey + " deviceid:" + device.deviceid + " error:" + device.error  + " IP: " + device.IP ;
+
+
+}
+
+
+function printDiv(deviceDiv,className,innerHtmlValue){
+    var div = document.createElement("span");
+    div.setAttribute("class", className);
+    div.innerHTML = innerHtmlValue;
+    deviceDiv.appendChild(div);
+}
+
 function printDeviceElement(device) {
     var content = document.getElementById("content");
 
@@ -79,43 +95,13 @@ function printDeviceElement(device) {
     deviceDiv.setAttribute("class", "device " + device.type);
     content.appendChild(deviceDiv);
 
-    var deviceName = document.createElement("span");
-    deviceName.setAttribute("class", "deviceName");
-    deviceName.innerHTML = device.name;
-    deviceDiv.appendChild(deviceName);
+    printDiv(deviceDiv,"deviceName",device.name);
+    printDiv(deviceDiv,"deviceOther",device.model);
+    printDiv(deviceDiv,"deviceOther",device.apikey);
+    printDiv(deviceDiv,"deviceOther",device.deviceid);
+    printDiv(deviceDiv,"deviceOther",device.romVersion);
+    printDiv(deviceDiv,"deviceOther",device.type);
 
-    var model1 = document.createElement("span");
-    model1.setAttribute("class", "deviceOther");
-    model1.innerHTML = "model: " +  device.model;
-    deviceDiv.appendChild(model1);
-
-    var apikey = document.createElement("span");
-    apikey.setAttribute("class", "deviceOther");
-    apikey.innerHTML = "api: " + device.apikey;
-    deviceDiv.appendChild(apikey);
-
-    var deviceid = document.createElement("span");
-    deviceid.setAttribute("class", "deviceOther");
-    deviceid.innerHTML = "deviceid: " + device.deviceid;
-    deviceDiv.appendChild(deviceid);
-
-    //
-    //var deviceName = document.createElement("span");
-    //deviceName.setAttribute("class", "deviceName");
-    //deviceName.innerHTML = device.name;
-    //deviceDiv.appendChild(deviceName);
-    //
-    //type: type,
-    //    id: null,
-    //    deviceid: deviceid,
-    //    apikey: apiKey,
-    //    romVersion: romVersion,
-    //    model: model,
-    //    description: description
-
-    var deviceType = document.createElement("span");
-    deviceType.innerHTML = "<b>Type:</b> " + device.type;
-    deviceDiv.appendChild(deviceType);
 
     var deviceStatus = document.createElement("span");
     if (device.status === "On") {

@@ -4,6 +4,7 @@ plugins {
     id 'war'
     id 'io.spring.dependency-management' version '1.0.1.RELEASE'
     id 'idea' // optional (to generate IntelliJ IDEA project files)
+    id 'org.hidetake.ssh'  version '2.9.0'
 
 }
 
@@ -74,6 +75,16 @@ dependencies {
     compile group: 'javax.enterprise', name: 'cdi-api', version: '2.0'
     compile group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
 
+   // compile "org.codehaus.groovy.modules.http-builder:http-builder:0.5.2"
+
+// https://mvnrepository.com/artifact/org.mock-server/mockserver-client-java
+    compile group: 'org.mock-server', name: 'mockserver-client-java', version: '5.5.0'
+    //compile group: 'org.mock-server', name: 'mockserver-maven-plugin', version: '3.8.1'
+
+// https://mvnrepository.com/artifact/org.mortbay.jetty/jetty
+   // compile group: 'org.mortbay.jetty', name: 'jetty', version: '6.1.5'
+
+
     testCompile('org.junit.jupiter:junit-jupiter-api:5.3.2')
     testCompile('org.junit.jupiter:junit-jupiter-params:5.3.2')
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.3.2')
@@ -100,6 +111,26 @@ test {
 }
 
 
+remotes {
+    webServer {
+        host = '192.168.1.180'
+        user = 'tomcat'
+        identity = file('id_rsa')
+    }
+}
+
+task deploy {
+    doLast {
+        ssh.run {
+            session(remotes.webServer) {
+                put from: 'build/libs/sonoffwebsockets.war', into: '/tmp'
+                //execute 'sudo service tomcat restart'
+            }
+        }
+    }
+}
+
+
 task echo{
   //  println "echo $printenv"
 }
@@ -111,6 +142,27 @@ jar {
 
 war {
     archiveName = 'sonoffwebsockets.war'
+
+   // metaInf { from 'src/main/resources/context.xml' }
+
+
+
+}
+
+// https://localhost:9443/docs/manager-howto.html#Deploy_a_Directory_or_WAR_by_URL
+// https://localhost:9443/manager/text/deploy?path=/sonoffwebsockets&war=file:/tmp/sonoff-webapps/sonoffwebsockets.war
+//https://localhost:9443/manager/text/deploy?update=true&path=/tmp/sonoff-webapps/sonoffwebsockets.war
+
+// works: https://localhost:9443/manager/text/undeploy?path=/sonoffwebsockets
+// works: https://localhost:9443/manager/text/deploy?path=/sonoffwebsockets&war=file:/tmp/sonoff-webapps/sonoffwebsockets.war
+// works: https://192.168.1.180:9443/manager/text/deploy?path=/sonoffwebsockets&war=file:/tmp/sonoff-webapps/sonoffwebsockets.war
+
+
+
+
+task deployLocalTomcat(type: Copy) {
+    from 'build/libs/sonoffwebsockets.war'
+    into '/tmp/sonoff-webapps'
 }
 
 
@@ -118,14 +170,27 @@ task cleanWar( type:Exec) {
     // workingDir "${glassfishHome${File.separator}bin"
     workingDir "/opt/glassfish5/glassfish/bin"
 
-    //  if (System.properties['os.name'].toLowerCase().contains('windows')) {
-    //      commandLine 'cmd', '/c', 'asadmin.bat'
-    //  } else {
 
     commandLine "./asadmin"
-    // }
     args "undeploy",  "sonoffwebsockets"
+
+
+
 }
+
+task undeployTomcat( type:Exec) {
+    // workingDir "${glassfishHome${File.separator}bin"
+    workingDir "/opt/glassfish5/glassfish/bin"
+
+
+    commandLine "./wget"
+    args "undeploy",  "sonoffwebsockets"
+
+
+
+}
+
+
 
 //war.dependsOn cleanWar
 
@@ -141,3 +206,6 @@ task run(dependsOn: 'war', type:Exec) {
    // }
     args "deploy", "--force=true", "/home/bearingpoint/wk-devops/SonoffWebSockets/build/libs/sonoffwebsockets.war"
  }
+
+
+//https://gradle-ssh-plugin.github.io/

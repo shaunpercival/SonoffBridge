@@ -57,3 +57,10 @@ docker kill tomcat
 docker rm tomcat
 
 
+
+scp -r /home/bearingpoint/wk-devops/SonoffWebSockets/build-docker.sh  pi@192.168.1.180:/home/pi/sonoff-docker
+scp -r /home/bearingpoint/wk-devops/SonoffWebSockets/build-docker.sh  pi@192.168.1.180:/home/pi/sonoff-docker
+scp -r /home/bearingpoint/wk-devops/SonoffWebSockets/src/docker-resources pi@192.168.1.180:/home/pi/sonoff-docker
+scp -r /home/bearingpoint/wk-devops/SonoffWebSockets/src/main/resources/ pi@192.168.1.180:/home/pi/sonoff-docker
+scp -/home/bearingpoint/wk-devops/SonoffWebSockets/build/libs/sonoffwebsockets.war pi@192.168.1.180:/tmp/sonoff-webapps
+

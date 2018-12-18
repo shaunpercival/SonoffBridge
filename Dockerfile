@@ -158,11 +158,6 @@ RUN set -eux; \
 
 RUN apt-get update && apt-get install -y --no-install-recommends vim
 
-# Copy in webapp dependencies
-COPY src/docker-resources/tomcat-users.xml /usr/local/tomcat/conf
-COPY src/docker-resources/selfsigned.jks /usr/local/tomcat/conf
-COPY src/docker-resources/server.xml /usr/local/tomcat/conf
-#RUN /bin/bash -c "mkdir -p /sonoff"
 
 
 # verify Tomcat Native is working properly
@@ -180,7 +175,17 @@ COPY src/main/resources/sonoffws.properties /usr/local/tomcat/conf
 COPY src/main/resources/devices.properties /usr/local/tomcat/conf
 #force rebuild
 
+# Copy in webapp dependencies
+COPY src/docker-resources/tomcat-users.xml /usr/local/tomcat/conf
+COPY src/docker-resources/selfsigned.jks /usr/local/tomcat/conf
+COPY src/docker-resources/server.xml /usr/local/tomcat/conf
+#RUN /bin/bash -c "mkdir -p /sonoff"
+
+
 COPY build/libs/sonoffwebsockets.war /usr/local/tomcat/webapps
+
+# TODO /usr/local/tomcat/webapps/manager/META-INF
+#
 
 
 EXPOSE 9080

@@ -17,11 +17,6 @@
     <output-test url="file://$MODULE_DIR$/../../../build/classes/java/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../src">
-      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/webapp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../src/test/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../../src/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../src/build" />
     </content>

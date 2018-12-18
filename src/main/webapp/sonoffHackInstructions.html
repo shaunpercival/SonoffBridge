@@ -17,7 +17,9 @@ Usually, when we are reading reviews about cost effective smart home power relay
 But this is not our way of doing things. We do not want to touch hardware, we want to solve everything with server software only. So let’s do it!
 
 Pairing and initialization of Sonoff WiFi Wireless Smart Switch
-First of all, let’s do pairing. This is very straight forward, like any other smart device. Long click on manage button (let will start blinking fast). Look for wifi access point starting with “ITEAD-10000”. Connect to it with password “12345678”. Take into account, ITLead smart switch has time out in AP mode. If you will not configure it in given time, it closes AP and you should start all over again.
+First of all, let’s do pairing. This is very straight forward, like any other smart device. Long click on manage button (let will start blinking fast).
+Look for wifi access point starting with “ITEAD-10000”. Connect to it with password “12345678”. Take into account, ITLead smart switch has time out in AP mode.
+If you will not configure it in given time, it closes AP and you should start all over again.
 
 Now when you connected, get device info by sending simple HTTP get request to http://10.10.7.1/device
 
@@ -31,6 +33,9 @@ As response you will get following JSON object
 "apikey":"xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 "accept":"post"
 }
+
+//https://github.com/mdopp/simple-sonoff-server
+
 This is your API key and DeviceID. Store it, you will need it later
 
 Next call will configure default server for the device. Send HTTP POST message to
