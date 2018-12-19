@@ -33,6 +33,26 @@ public class HTTPSonoffEmulator {
 
     }
 
+    private void printHeadersAndPayload(HttpExchange he) throws IOException{
+        System.out.println("print headers");
+        Headers headers = he.getRequestHeaders();
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String headerName = entry.getKey();
+            for (String headerValue : entry.getValue()) {
+                System.out.println(headerName + "    " + headerValue);
+            }
+        }
+        InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
+        BufferedReader br = new BufferedReader(isr);
+        String query ;
+        String result = "";
+        while ((query = br.readLine()) != null){
+            result += query;
+        }
+        System.out.println("Query: " + result);
+    }
+
+
     public class RootHandler implements HttpHandler {
 
         @Override
@@ -42,16 +62,13 @@ public class HTTPSonoffEmulator {
 
             // parse request
             Map<String, Object> parameters = new HashMap<String, Object>();
-            InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
-            BufferedReader br = new BufferedReader(isr);
-            String query ;
-            String result = "";
-            while ((query = br.readLine()) != null){
-                result += query;
-            }
+
+
             System.out.println("Root handler: " + new Date());
-            System.out.println("Query: " + result);
             System.out.println("url" + he.getRequestURI());
+
+            printHeadersAndPayload(he);
+
 
             String response = "<h1>Server start success"+
             "if you see this message</h1>" + "<h1>Port: " + port + "</h1>";
@@ -85,6 +102,7 @@ public class HTTPSonoffEmulator {
             // parse request
             Map<String, Object> parameters = new HashMap<String, Object>();
             System.out.println("Received /device call "  + new Date());
+            printHeadersAndPayload(he);
             String response = "{ \"deviceid\":\"1000222565\", \"apikey\": \"cea052a6-4a49-41f4-be5b-f3db537376bc\", \"accept\":\"post\" }";
             Headers headers = he.getResponseHeaders();
             headers.set("Content-Type", "application/json");
@@ -101,29 +119,25 @@ public class HTTPSonoffEmulator {
         @Override
 
         public void handle(HttpExchange he) throws IOException {
+
+            System.out.println("-------------------------------------------------");
             // parse request
             Map<String, Object> parameters = new HashMap<String, Object>();
-            InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
-            BufferedReader br = new BufferedReader(isr);
-            String query ;
-            String result = "";
-            while ((query = br.readLine()) != null){
-                result += query;
-            }
-
-            System.out.println("Received /ap call"  + new Date());
-
-            System.out.println("query: " + result);
 
 
-            parseQuery(query, parameters);
+
+
+            printHeadersAndPayload(he);
+
+
+            //parseQuery(query, parameters);
 
             // send response
             String response = "";
             for (String key : parameters.keySet())
                 response += key + " = " + parameters.get(key) + "\n";
             System.out.println("Inputs: " + response);
-            response = "{ \"deviceid\":\"1000222565\", \"apikey\": \"cea052a6-4a49-41f4-be5b-f3db537376bc\", \"accept\":\"post\" }";
+            response = "{ \"action\": 0}";
 
 
             Headers headers = he.getResponseHeaders();

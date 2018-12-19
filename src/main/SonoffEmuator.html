@@ -1,0 +1,80 @@
+<html>
+
+<body>
+
+
+<p>
+    <b>
+    --------------------------------------------------
+    ---------------------------------------------------
+    Windows 7 ITEAD Mocking
+    -----------------------
+    </b>
+    </p>
+<p>
+    First set up interface on windows
+
+    netsh wlan set hostednetwork mode=allow ssid=ITEAD-1000222565 key=12345678
+    netsh wlan start hostednetwork
+    netsh wlan stop hostednetwork
+    netsh wlan show hostednetwork
+
+    Then go on and set IP address:
+    Control Panel\Network and Internet\Network Connections
+    Properties and change IP addressing to:
+    IP      :  10.10.7.1
+    Mask    :  255.0.0.0
+    Default :  blank
+    Then go to windows firewall and turn off trusted networks
+
+    Run HTTP Sonoff Emulator:
+    Run on VM gradle emulator 'build jar copyToMnt'
+    cd C:\Users\shaun.percival\Documents\vm-share>
+    java -cp sonoffwebsockets.jar org.sonoff.httpserver.HTTPSonoffEmulator 10.10.7.1 80
+
+
+</p>
+
+<p><b>
+------------------------------------------------------
+Setup Android
+-----------------------------------------------------
+</b></p>
+    <p>
+Manually connect to new wiifi network.
+Turn location and mobile data on
+In Wifi, long press on 'ITEAD-1000222565'  then select advanced checkbox.
+Select static, then add the following:
+IP : 10.10.7.4
+default: (Defaults to 10.10.7.1)
+Wait for setting to say do you want to remember and connect without internet 'ye'
+Check routing working with browser validation http://10.10.7.1/
+
+Fire up eWee, select manual AP setting
+Important: It will connect, reset connetion to dhcp and lose IP, so as soon as it has reconnected back to ITEADm
+so you need to reset the IP address
+</p>
+
+<p><b>
+----------------------------------------------------------
+Expected output catpured from eWee connection was 19-May-
+
+-------------------------------------------------
+</b></p>
+<p>
+print headers
+Accept-encoding    gzip
+Connection    Keep-Alive
+Host    10.10.7.1
+User-agent    okhttp/3.10.0
+Content-type    application/json; charset=utf-8
+Content-length    84
+Query: {"ssid":"irishrail-wifi","password":"xxxxxxxxxxxx","serverName":"eu-disp.coolkit.cc",
+"port":443}
+
+</p>
+
+</body>
+
+
+</html>
